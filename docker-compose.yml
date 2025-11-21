@@ -1,0 +1,56 @@
+version: '3.9'
+
+services:
+  pedidos-service:
+    build:
+      context: ./pedidos-service/DeliveryHub.Pedidos.Api
+    container_name: pedidos-service
+    ports:
+      - "8081:8080"
+    networks:
+      - deliveryhub-net
+
+  entregas-service:
+    build:
+      context: ./entregas-service/DeliveryHub.Entregas.Api
+    container_name: entregas-service
+    ports:
+      - "8082:8080"
+    networks:
+      - deliveryhub-net
+
+  entregadores-service:
+    build:
+      context: ./entregadores-service/DeliveryHub.Entregadores.Api
+    container_name: entregadores-service
+    ports:
+      - "8083:8080"
+    networks:
+      - deliveryhub-net
+
+  auth-service:
+    build:
+      context: ./auth-service/DeliveryHub.Auth.Api
+    container_name: auth-service
+    ports:
+      - "8084:8080"
+    networks:
+      - deliveryhub-net
+
+  gateway:
+    build:
+      context: ./gateway/DeliveryHub.Gateway
+    container_name: gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - pedidos-service
+      - entregas-service
+      - entregadores-service
+      - auth-service
+    networks:
+      - deliveryhub-net
+
+networks:
+  deliveryhub-net:
+    driver: bridge

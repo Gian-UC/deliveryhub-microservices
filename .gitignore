@@ -1,0 +1,13 @@
+bin/
+obj/
+out/
+*.user
+*.suo
+*.cache
+.vs/
+.vscode/
+.env
+*.db
+*.sqlite
+docker-data/
+logs/

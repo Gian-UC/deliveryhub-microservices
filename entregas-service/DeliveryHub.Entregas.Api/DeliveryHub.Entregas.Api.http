@@ -1,0 +1,6 @@
+@DeliveryHub.Entregas.Api_HostAddress = http://localhost:5210
+
+GET {{DeliveryHub.Entregas.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
