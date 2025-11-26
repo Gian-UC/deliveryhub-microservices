@@ -1,12 +1,23 @@
 version: '3.9'
 
 services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"   # porta de comunicação dos serviços
+      - "15672:15672" # painel web para visualizar filas
+    networks:
+      - deliveryhub-net
+
   pedidos-service:
     build:
       context: ./pedidos-service/DeliveryHub.Pedidos.Api
     container_name: pedidos-service
     ports:
       - "8081:8080"
+    depends_on:
+      - rabbitmq
     networks:
       - deliveryhub-net
 
@@ -16,6 +27,8 @@ services:
     container_name: entregas-service
     ports:
       - "8082:8080"
+    depends_on:
+      - rabbitmq
     networks:
       - deliveryhub-net
 
@@ -25,6 +38,8 @@ services:
     container_name: entregadores-service
     ports:
       - "8083:8080"
+    depends_on:
+      - rabbitmq
     networks:
       - deliveryhub-net
 
@@ -34,6 +49,8 @@ services:
     container_name: auth-service
     ports:
       - "8084:8080"
+    depends_on:
+      - rabbitmq
     networks:
       - deliveryhub-net
 
@@ -48,6 +65,7 @@ services:
       - entregas-service
       - entregadores-service
       - auth-service
+      - rabbitmq
     networks:
       - deliveryhub-net
 
