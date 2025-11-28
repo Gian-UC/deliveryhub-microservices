@@ -7,6 +7,11 @@ services:
     ports:
       - "5672:5672"   # porta de comunicação dos serviços
       - "15672:15672" # painel web para visualizar filas
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     networks:
       - deliveryhub-net
 
@@ -28,7 +33,8 @@ services:
     ports:
       - "8082:8080"
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     networks:
       - deliveryhub-net
 

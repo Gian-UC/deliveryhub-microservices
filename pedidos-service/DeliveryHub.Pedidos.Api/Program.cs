@@ -1,3 +1,4 @@
+using DeliveryHub.Pedidos.Api.Messaging;
 using DeliveryHub.Pedidos.Api.Repositories;
 using DeliveryHub.Pedidos.Api.Services;
 
@@ -6,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSingleton<PedidoCriadoProducer>();
 
 // DI - Registrar dependências
 builder.Services.AddSingleton<IPedidoRepository, InMemoryPedidoRepository>();
