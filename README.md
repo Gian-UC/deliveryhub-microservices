@@ -1,99 +1,134 @@
-# DeliveryHub‑Microservices
+<p align="center">
+  <img src="https://i.imgur.com/G3Q8qJd.png" width="820" />
+</p>
 
-> Microservices architecture built with .NET 8, Docker, YARP Gateway and WSL2 environment.
+<h1 align="center">🚀 DeliveryHub-Microservices</h1>
+<p align="center">
+  Arquitetura de microserviços moderna, performática e divertida — construída com .NET 8, RabbitMQ, Docker, YARP e muito carinho da Aria 💙😎
+</p>
 
-## 🧾 Tecnologias
+---
 
-| Camada                      | Tecnologia                             |
-|-----------------------------|---------------------------------------|
-| Linguagem                  | C#                                    |
-| Framework                 | .NET 8 Web API                         |
-| Containerização           | Docker (Engine via WSL2)              |
-| Orquestração              | Docker Compose                        |
-| API Gateway              | YARP Reverse Proxy                     |
-| Banco de Dados (futura)   | PostgreSQL / MySQL (a definir)        |
-| Autenticação              | JWT Token                             |
-| Hospedagem (futura)       | Azure Container Apps / AKS            |
+## 💙 Tecnologias Utilizadas
 
-## 🏗️ Arquitetura
+| Camada / Função            | Tecnologia                              |
+|----------------------------|------------------------------------------|
+| Linguagem                 | C#                                       |
+| Framework Backend         | .NET 8 Web API                           |
+| Comunicação Assíncrona    | RabbitMQ                                 |
+| Gateway                   | YARP Reverse Proxy                       |
+| Banco de Dados            | PostgreSQL                               |
+| Autenticação              | JWT Token                                |
+| Containerização           | Docker (WSL2 Backend)                    |
+| Orquestração              | Docker Compose                           |
+| Logs / Observabilidade    | ASP.NET Logging + Docker Logs            |
+| Infra futura              | Azure Container Apps / AKS               |
 
-[ Client ] → [ Gateway (YARP) ] → { Auth Service | Pedidos Service | Entregas Service | Entregadores Service }
+---
+
+## 🏗️ Arquitetura Geral
+
+[ Client SPA / Mobile ]
+↓
+[ Gateway (YARP) ]
+↓
+┌────────┼───────────┬──────────────┐
+│ │ │ │
+│ Auth Service Pedidos Entregas Entregadores
+│ Service Service Service
+│
+└───────────────⇆ RabbitMQ (Event Bus)
 
 
-Cada microserviço roda em sua própria imagem Docker, escopo isolado, comunicando-se via gateway.
+• Cada serviço roda em **seu próprio container**  
+• Comunicação interna via gateway  
+• Eventos (pedido criado, atualização, etc.) trafegam pelo **RabbitMQ**  
+• Banco de dados isolado por serviço (modelo real de microserviços)  
 
-## 🚀 Como rodar localmente
+---
 
-Requisitos:
+## 🚀 Rodando Localmente
 
-- Windows 10/11 com WSL2 e Ubuntu 22.04
-- .NET SDK 8.0
-- Docker Engine via WSL2
+**Requisitos**
+
+- Windows 10/11  
+- WSL2 + Ubuntu 22.04  
+- Docker Engine no WSL2  
+- .NET SDK 8.0  
+
+**Comandos:**
 
 ```bash
 cd deliveryhub-microservices
 docker compose build
 docker compose up -d
+🌐 Endpoints via Gateway
+O Gateway roda padrão na porta:
+http://localhost:8081/
 ```
-Abra o browser e acesse:
+🔐 Auth Service
+POST /api/auth/register
+POST /api/auth/login
 
-http://localhost:8080 → Gateway
+📦 Pedidos Service
+GET  /api/pedidos
+POST /api/pedidos
+PUT  /api/pedidos/{id}
 
-http://localhost:8080/pedidos → Pedidos Service
+🚚 Entregas Service
+GET  /api/entregas
+POST /api/entregas/iniciar
 
-http://localhost:8080/auth → Auth Service
+👤 Entregadores Service
+GET  /api/entregadores
+POST /api/entregadores
 
-etc.
+🐇 RabbitMQ (Event Bus)
+Eventos publicados:
+pedido.criado
+pedido.atualizado
 
-🧪 Uso dos serviços
-Pedidos Service
+Filas:
+entregas-pedido-criado
+entregas-status-atualizado
 
-GET /pedidos — lista todos
+Painel do RabbitMQ:
+http://localhost:15672/
+user: guest
+pass: guest
 
-POST /pedidos — cria novo
+📦 Estrutura do Projeto
+deliveryhub-microservices/
+│
+├── pedidos-service/
+├── entregas-service/
+├── entregadores-service/
+├── auth-service/
+├── gateway/
+│── docker-compose.yml
+└── README.md
 
-PUT /pedidos/{id} — atualiza status
+🔧 Docker Compose
+Cada serviço tem seu Dockerfile próprio e roda isolado:
 
-Entregas Service
+• gateway expõe a porta 8081
+• serviços internos expõem portas 8080-8084
+• RabbitMQ + Postgres já sobem automaticamente
 
-GET /entregas — lista
+🧪 Checklist do Projeto
+✔ Microserviços 100% independentes
+✔ Banco de dados isolado
+✔ Comunicação via RabbitMQ
+✔ Gateway YARP configurado
+✔ Docker Compose com 7 containers
+✔ Build estável no WSL2
+✔ Código padronizado com .NET 8
+✔ Configurado para GitHub
 
-POST /entregas — iniciar entrega
+🧩 Branching
+Branch	Descrição
+main	versão estável
+develop	próxima release
+feature/*	novas funcionalidades
 
-Entregadores Service
 
-GET /entregadores — lista
-
-POST /entregadores — registra entregador
-
-Auth Service
-
-POST /auth/register — registra usuário
-
-POST /auth/login — retorna token JWT
-
-Todos os endpoints são passados via Gateway em http://localhost:8080/*.
-
-✅ Checklist concluído
-
-✅ Cada microserviço em .NET 8
-
-✅ Gateway com YARP
-
-✅ Docker Engine no WSL2
-
-✅ Docker Compose com múltiplos serviços
-
-✅ Build+Run sem erros
-
-✅ Repositório GitHub configurado
-
-📂 Branching & Contribuição
-
-main – versão pronta para produção
-
-develop – versão em desenvolvimento
-
-**feature/*” – novas funcionalidades
-
-Sinta‑se à vontade para abrir Issues e Pull Requests.
