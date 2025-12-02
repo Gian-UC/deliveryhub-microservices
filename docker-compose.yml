@@ -1,80 +1,86 @@
-version: '3.9'
-
 services:
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: rabbitmq
-    ports:
-      - "5672:5672"   # porta de comunicação dos serviços
-      - "15672:15672" # painel web para visualizar filas
-    healthcheck:
-      test: ["CMD", "rabbitmqctl", "status"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-    networks:
-      - deliveryhub-net
-
   pedidos-service:
     build:
       context: ./pedidos-service/DeliveryHub.Pedidos.Api
-    container_name: pedidos-service
+      dockerfile: Dockerfile
     ports:
-      - "8081:8080"
+      - "8080:8080"
     depends_on:
       - rabbitmq
+      - postgres
     networks:
       - deliveryhub-net
 
   entregas-service:
     build:
       context: ./entregas-service/DeliveryHub.Entregas.Api
-    container_name: entregas-service
+      dockerfile: Dockerfile
     ports:
       - "8082:8080"
     depends_on:
-      rabbitmq:
-        condition: service_healthy
+      - rabbitmq
+      - postgres
     networks:
       - deliveryhub-net
 
   entregadores-service:
     build:
       context: ./entregadores-service/DeliveryHub.Entregadores.Api
-    container_name: entregadores-service
+      dockerfile: Dockerfile
     ports:
       - "8083:8080"
-    depends_on:
-      - rabbitmq
     networks:
       - deliveryhub-net
 
   auth-service:
     build:
       context: ./auth-service/DeliveryHub.Auth.Api
-    container_name: auth-service
+      dockerfile: Dockerfile
     ports:
       - "8084:8080"
-    depends_on:
-      - rabbitmq
     networks:
       - deliveryhub-net
 
   gateway:
     build:
       context: ./gateway/DeliveryHub.Gateway
-    container_name: gateway
+      dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "8081:8080"
     depends_on:
       - pedidos-service
       - entregas-service
       - entregadores-service
       - auth-service
-      - rabbitmq
     networks:
       - deliveryhub-net
 
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - deliveryhub-net
+
+  postgres:
+    image: postgres:15
+    container_name: deliveryhub-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: pedidosdb
+    ports:
+      - "5432:5432"
+    networks:
+      - deliveryhub-net
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
 networks:
   deliveryhub-net:
-    driver: bridge
+
+volumes:
+  pgdata:
