@@ -1,15 +1,9 @@
+using DeliveryHub.Entregas.Api.Dtos;
 using DeliveryHub.Entregas.Api.Models;
 using DeliveryHub.Entregas.Api.Repositories;
 
 namespace DeliveryHub.Entregas.Api.Services
 {
-    public interface IEntregaService
-    {
-        Task CriarEntregaPorEventoAsync(Guid pedidoId, string clienteNome, decimal valorTotal);
-        Task<List<Entrega>> ListarAsync();
-        Task<Entrega?> ObterPorIdAsync(Guid id);
-    }
-
     public class EntregaService : IEntregaService
     {
         private readonly IEntregaRepository _repository;
@@ -19,31 +13,42 @@ namespace DeliveryHub.Entregas.Api.Services
             _repository = repository;
         }
 
-        public async Task CriarEntregaPorEventoAsync(Guid pedidoId, string clienteNome, decimal valorTotal)
+        public async Task<EntregaResponse> CriarEntregaAsync(Guid pedidoId, string clienteNome)
         {
             var entrega = new Entrega
             {
-                Id = Guid.NewGuid(),
                 PedidoId = pedidoId,
                 ClienteNome = clienteNome,
-                ValorTotal = valorTotal,
-                Status = "Em Rota",
-                CriadoEm = DateTime.UtcNow
+                Status = StatusEntrega.EmRota
             };
 
             await _repository.AdicionarAsync(entrega);
 
-            Console.WriteLine($"ENTREGA CRIADA PARA O PEDIDO {pedidoId}!");
+            return Map(entrega);
         }
 
-        public Task<List<Entrega>> ListarAsync()
+        public async Task<IEnumerable<EntregaResponse>> ListarAsync()
         {
-            return _repository.ListarAsync();
+            var entregas = await _repository.ListarAsync();
+            return entregas.Select(Map);
         }
 
-        public Task<Entrega?> ObterPorIdAsync(Guid id)
+        public async Task<EntregaResponse?> ObterPorIdAsync(Guid id)
         {
-            return _repository.ObterPorIdAsync(id);
+            var entrega = await _repository.ObterPorIdAsync(id);
+            return entrega is null ? null : Map(entrega);
+        }
+
+        private static EntregaResponse Map(Entrega entrega)
+        {
+            return new EntregaResponse
+            {
+                Id = entrega.Id,
+                PedidoId = entrega.PedidoId,
+                ClienteNome = entrega.ClienteNome,
+                Status = entrega.Status.ToString(),
+                CriadoEm = entrega.CriadoEm
+            };
         }
     }
 }

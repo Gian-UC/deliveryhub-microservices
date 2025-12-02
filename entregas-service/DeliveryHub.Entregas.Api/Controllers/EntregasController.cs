@@ -1,36 +1,35 @@
-using DeliveryHub.Entregas.Api.Models;
-using DeliveryHub.Entregas.Api.Repositories;
+using DeliveryHub.Entregas.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DeliveryHub.Entregas.Api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/entregas")]
     public class EntregasController : ControllerBase
     {
-        private readonly IEntregaRepository _repository;
+        private readonly IEntregaService _service;
 
-        public EntregasController(IEntregaRepository repository)
+        public EntregasController(IEntregaService service)
         {
-            _repository = repository;
+            _service = service;
         }
 
-        // GET /api/entregas
+        // GET api/entregas
         [HttpGet]
-        public async Task<IActionResult> ListarAsync()
+        public async Task<IActionResult> Listar()
         {
-            var entregas = await _repository.ListarAsync();
+            var entregas = await _service.ListarAsync();
             return Ok(entregas);
         }
 
-        // GET /api/entregas/{id}
+        // GET api/entregas/{id}
         [HttpGet("{id:guid}")]
-        public async Task<IActionResult> ObterPorIdAsync(Guid id)
+        public async Task<IActionResult> ObterPorId(Guid id)
         {
-            var entrega = await _repository.ObterPorIdAsync(id);
+            var entrega = await _service.ObterPorIdAsync(id);
 
-            if (entrega is null)
-                return NotFound();
+            if (entrega == null)
+                return NotFound(new { message = "Entrega não encontrada" });
 
             return Ok(entrega);
         }

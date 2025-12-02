@@ -1,5 +1,13 @@
 bin/
 obj/
+.env
+*.db
+*.sqlite
+node_modules/
+pgdata/
+docker-data/
+**/Properties/launchSettings.jsonbin/
+obj/
 out/
 *.user
 *.suo

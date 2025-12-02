@@ -6,8 +6,10 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - rabbitmq
-      - postgres
+      rabbitmq:
+        condition: service_healthy
+      postgres:
+        condition: service_started
     networks:
       - deliveryhub-net
 
@@ -18,8 +20,10 @@ services:
     ports:
       - "8082:8080"
     depends_on:
-      - rabbitmq
-      - postgres
+      rabbitmq:
+        condition: service_healthy
+      postgres:
+        condition: service_started
     networks:
       - deliveryhub-net
 
@@ -29,6 +33,9 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8083:8080"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
     networks:
       - deliveryhub-net
 
@@ -38,6 +45,9 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8084:8080"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
     networks:
       - deliveryhub-net
 
@@ -48,10 +58,14 @@ services:
     ports:
       - "8081:8080"
     depends_on:
-      - pedidos-service
-      - entregas-service
-      - entregadores-service
-      - auth-service
+      pedidos-service:
+        condition: service_started
+      entregas-service:
+        condition: service_started
+      entregadores-service:
+        condition: service_started
+      auth-service:
+        condition: service_started
     networks:
       - deliveryhub-net
 
@@ -61,6 +75,11 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     networks:
       - deliveryhub-net
 
