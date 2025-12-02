@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://i.imgur.com/G3Q8qJd.png" width="820" />
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:0f172a,100:0ea5e9&height=200&section=header&text=DeliveryHub%20Microservices&fontSize=40&fontColor=ffffff&animation=fadeIn" alt="DeliveryHub Microservices banner" />
 </p>
 
 <h1 align="center">🚀 DeliveryHub-Microservices</h1>
@@ -130,5 +130,6 @@ Branch	Descrição
 main	versão estável
 develop	próxima release
 feature/*	novas funcionalidades
+
 
 
